@@ -3,11 +3,13 @@ package com.diamonds.server.impl;
 import com.diamonds.server.OrderService;
 import com.diamonds.server.discount.VipDiscount;
 import com.diamonds.server.domin.UserInfoCache;
+import com.diamonds.server.event.OrderEvent;
 import com.diamonds.server.manager.WebManager;
 import com.diamonds.server.request.OrderRequest;
 import com.diamonds.server.response.OrderResponse;
 import com.diamonds.server.utils.OrderSnGen;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderSnGen orderSnGen;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     private final HashMap<Integer, VipDiscount> vipDiscountMap = new HashMap<>();
 
@@ -44,6 +49,7 @@ public class OrderServiceImpl implements OrderService {
             // 乐观锁 or 队列 秒杀系列的这里暂不考虑 秒杀系列在另外的controller中处理
         });
         // 6、成功后的邮件or推送or短信
+        applicationContext.publishEvent(new OrderEvent(this, "message", currentUserInfo));
 
         OrderResponse response = new OrderResponse();
         response.setSuccess(true);
