@@ -2,6 +2,7 @@ package com.diamonds.server.domin;
 
 
 import java.io.Serializable;
+import java.time.Instant;
 
 public class UserInfoCache implements Serializable {
     /**
@@ -23,6 +24,16 @@ public class UserInfoCache implements Serializable {
      * user id
      */
     private String userId;
+
+    private Integer vipLevel;
+
+    public Integer getVipLevel() {
+        return vipLevel;
+    }
+
+    public void setVipLevel(Integer vipLevel) {
+        this.vipLevel = vipLevel;
+    }
 
     public String getRealName() {
         return realName;
