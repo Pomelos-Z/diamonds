@@ -11,6 +11,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // 加入的顺序就是拦截器执行的顺序
         registry.addInterceptor(interceptor).addPathPatterns("/**");
     }
 }
