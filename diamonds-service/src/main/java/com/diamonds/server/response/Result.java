@@ -56,6 +56,14 @@ public class Result {
         return JSONObject.toJSONString(result, SERIALIZE_CONFIG, SerializerFeature.WriteNullStringAsEmpty);
     }
 
+    public static String error(HttpStatus status) {
+        Result result = new Result();
+        result.setCode(status.value());
+        result.setSuccess(Boolean.FALSE);
+        result.setMessage(status.getReasonPhrase());
+        return JSONObject.toJSONString(result, SERIALIZE_CONFIG, SerializerFeature.WriteNullStringAsEmpty);
+    }
+
     public Integer getCode() {
         return code;
     }
