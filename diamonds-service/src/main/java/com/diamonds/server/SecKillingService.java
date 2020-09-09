@@ -1,18 +1,17 @@
 package com.diamonds.server;
 
 import com.diamonds.server.response.SecKillingPathResponse;
-import com.diamonds.server.response.SecKillingResponse;
 import com.diamonds.server.response.SecKillingResultResponse;
 
 import javax.servlet.http.HttpServletResponse;
 
 public interface SecKillingService {
 
-    SecKillingResponse secKilling(String path, String goodsId);
+    void secKilling(String path, String goodsId, String userPhone);
 
     SecKillingResultResponse getSecKillingResult(String goodsId);
 
-    SecKillingPathResponse getSecKillingPath(String goodsId, Integer verifyCode);
+    SecKillingPathResponse getSecKillingPath(String goodsId, String verifyCode, String userPhone);
 
-    void createVerifyCode(HttpServletResponse response);
+    void createVerifyCode(String userPhone, HttpServletResponse response);
 }
