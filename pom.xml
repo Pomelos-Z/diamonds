@@ -26,6 +26,8 @@
         <diamonds.version>0.0.1-SNAPSHOT</diamonds.version>
         <hutool.version>5.1.4</hutool.version>
         <fastjson.version>1.2.62</fastjson.version>
+        <mybatis.version>3.5.1</mybatis.version>
+        <spring.tx.version>5.2.3.RELEASE</spring.tx.version>
     </properties>
 
     <dependencies>
@@ -94,6 +96,16 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-tx</artifactId>
+                <version>${spring.tx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

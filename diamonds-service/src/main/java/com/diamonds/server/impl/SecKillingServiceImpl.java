@@ -4,7 +4,11 @@ import cn.hutool.core.util.StrUtil;
 import com.diamonds.common.constants.CacheKeyConstant;
 import com.diamonds.common.enums.SecKillingExceptionEnum;
 import com.diamonds.common.exception.SecKillingException;
+import com.diamonds.server.GoodsService;
+import com.diamonds.server.OrderService;
 import com.diamonds.server.SecKillingService;
+import com.diamonds.server.domin.GoodsInfo;
+import com.diamonds.server.domin.SecKillingOrderInfo;
 import com.diamonds.server.response.*;
 import com.framework.service.lock.exception.LockException;
 import com.framework.service.redis.RedisCache;
@@ -26,6 +30,12 @@ public class SecKillingServiceImpl implements SecKillingService, InitializingBea
     private RedisCache redisCache;
 
     @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private GoodsService goodsService;
+
+    @Autowired
     private RedisDistributedLockManager redisDistributedLockManager;
 
     // 存放商品的是否售卖完毕的状态 卖完了为true
@@ -39,10 +49,10 @@ public class SecKillingServiceImpl implements SecKillingService, InitializingBea
             throw new SecKillingException(SecKillingExceptionEnum.GOODS_NOT_EXIST);
         }
         // order gen -> redis lock
-        String orderId = null;
+        String orderSn = null;
         try {
-            orderId = redisDistributedLockManager.execute(StrUtil.format(CacheKeyConstant.SEC_KILLING_ORDER_LOCK_KEY, goodsId),
-                    300L, 1000L, () -> orderPerHandle(goodsId, userPhone));
+            orderSn = redisDistributedLockManager.execute(StrUtil.format(CacheKeyConstant.SEC_KILLING_ORDER_LOCK_KEY, goodsId),
+                    300L, 1000L, () -> orderService.secKillingOrder(goodsId, userPhone).getOrderSn());
         } catch (LockException e) {
             throw new SecKillingException(SecKillingExceptionEnum.SEC_KILLING_FAIL);
         }
@@ -60,18 +70,26 @@ public class SecKillingServiceImpl implements SecKillingService, InitializingBea
 
     }
 
-    private String orderPerHandle(String goodsId, String userPhone) {
-        // 订单初步生成
-        String orderId = "xxx";
-        return orderId;
-    }
-
     @Override
-    public SecKillingResultResponse getSecKillingResult(String goodsId) {
-        // success then return order id -> success
+    public SecKillingResultResponse getSecKillingResult(String goodsId, String userPhone) {
+        // success then return 1 and order id -> success
         // sec-killing is over and not order id return -1 -> failed
         // sec-killing is not over and not order id return 0 -> neutral
-        return null;
+        SecKillingOrderInfo orderInfo = orderService.getSecKillingOrderByUserPhoneAndGoodsId(goodsId, userPhone);
+        SecKillingResultResponse response = new SecKillingResultResponse();
+        if (orderInfo != null) {
+            //秒杀成功
+            response.setOrderSn(orderInfo.getOrderSn());
+            response.setSecKillingResult(1);
+        } else {
+            boolean isOver = localOverMap.get(goodsId);
+            if (isOver) {
+                response.setSecKillingResult(-1);
+            } else {
+                response.setSecKillingResult(0);
+            }
+        }
+        return response;
     }
 
     @Override
@@ -102,11 +120,11 @@ public class SecKillingServiceImpl implements SecKillingService, InitializingBea
     @Override
     public void afterPropertiesSet() throws Exception {
         // get all sec-killing goods here
-        List<Goods> goodsList = new ArrayList<>();
+        List<GoodsInfo> goodsInfoList = goodsService.getSecGoodsList();
 
-        goodsList.forEach(goods -> {
-            redisCache.put(StrUtil.format(CacheKeyConstant.SEC_KILLING_GOODS_KEY, goods.getId()), goods.getStockCount());
-            localOverMap.put(goods.getId(), false);
+        goodsInfoList.forEach(goodsInfo -> {
+            redisCache.put(StrUtil.format(CacheKeyConstant.SEC_KILLING_GOODS_KEY, goodsInfo.getId()), goodsInfo.getStockCount());
+            localOverMap.put(goodsInfo.getId(), false);
         });
     }
 }

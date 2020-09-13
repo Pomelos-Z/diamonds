@@ -17,12 +17,12 @@ public class OrderSnGen {
     private RedisCache redisCache;
 
     // 简单使用redis实现 可考虑雪花算法
-    public String generate(String userId) {
+    public String generate(String str) {
         DateFormat df = new SimpleDateFormat(DataConstant.DATA_FORMAT);
         Calendar calendar = Calendar.getInstance();
         String data = df.format(calendar.getTime());
         long increment = redisCache.getAndIncrement(CacheKeyConstant.ORDER_SN_KEY, getTomorrowZeroSeconds());
-        String orderSn = data + userId + "%05d";
+        String orderSn = data + str + "%05d";
         return String.format(orderSn, increment);
     }
 

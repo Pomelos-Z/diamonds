@@ -9,7 +9,7 @@ public interface SecKillingService {
 
     void secKilling(String path, String goodsId, String userPhone);
 
-    SecKillingResultResponse getSecKillingResult(String goodsId);
+    SecKillingResultResponse getSecKillingResult(String goodsId,String userPhone);
 
     SecKillingPathResponse getSecKillingPath(String goodsId, String verifyCode, String userPhone);
 

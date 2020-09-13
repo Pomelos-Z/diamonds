@@ -1,6 +1,6 @@
-package com.diamonds.server.response;
+package com.diamonds.server.domin;
 
-public class Goods {
+public class GoodsInfo {
     private String id;
     private String goodsName;
     private String goodsImg;

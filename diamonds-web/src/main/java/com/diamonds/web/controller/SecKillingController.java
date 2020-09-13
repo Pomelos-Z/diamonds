@@ -37,7 +37,7 @@ public class SecKillingController {
         if (userInfoCache == null) {
             throw new SecKillingException(SecKillingExceptionEnum.SESSION_ERROR);
         }
-        return Result.success(secKillingService.getSecKillingResult(goodsId));
+        return Result.success(secKillingService.getSecKillingResult(goodsId, userInfoCache.getPhone()));
     }
 
     @Limit(seconds = 5, maxCount = 5)
